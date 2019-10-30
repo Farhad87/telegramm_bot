@@ -9,7 +9,7 @@ def get_updates():
     url = URL + 'getupdates'
     print(url)
     r = requests.get(url)
-    return r
+    return r.json()
 
 def main():
     print(get_updates())
