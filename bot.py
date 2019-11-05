@@ -18,8 +18,9 @@ def send_message(token, chat_id, text='text'):
     return requests.get(url)
 
 
-@app.route('/<str:token>/', methods=['GET', 'POST'])
+@app.route('/<token>/', methods=['GET', 'POST'])
 def index(token):
+    token = str(token)
     if request.method == 'POST':
         r = request.get_json()
         chat_id = r['message']['chat']['id']
