@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sslify import SSLify
 from flask import request
+import os
 import requests
 import numpy as np
 from keras.models import load_model
@@ -76,4 +77,5 @@ def index(token):
 
 
 if __name__ == '__main__':
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
