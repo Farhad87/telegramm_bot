@@ -75,5 +75,5 @@ def index(token):
     return '<h1>test server</h1>'
 
 
-if __name__ == '__main__':
-    app.run()
+# if __name__ == '__main__':
+#     app.run()
