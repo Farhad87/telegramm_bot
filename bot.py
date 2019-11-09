@@ -1,18 +1,15 @@
 from flask import Flask
 from flask_sslify import SSLify
 from flask import request
-import os
 import requests
 import numpy as np
-from keras.models import load_model
-from keras.preprocessing import image
+import json
 from PIL import Image
 from io import BytesIO
 
 
 app = Flask(__name__)
 ssl = SSLify(app)
-model = load_model('model_VGG16.h5')
 
 
 def get_photo(photo_id, token):
@@ -32,12 +29,22 @@ def send_message(token, chat_id, text='text'):
     return requests.get(url)
 
 
+def get_prediction(x):
+    headers = {"content-type": "application/json"}
+    data = json.dumps({"signature_name": "serving_default", "instances": x.tolist()})
+    json_response = requests.post('http://178.205.141.180:888/v1/models/cats_and_dogs_vgg16/versions/1:predict',
+                                  data=data,
+                                  headers=headers)
+    return json.loads(json_response.text)['predictions'][0][0]
+
+
 def image_classifier(token, photo_id):
     img = get_photo(photo_id, token)
-    x = image.img_to_array(img)
+    x = np.asarray(img)
+    # x = image.img_to_array(img)
     x = np.expand_dims(x, axis=0)
-    classes = model.predict(x)
-    if classes[0] > 0.5:
+    prediction = get_prediction(x)
+    if prediction > 0.5:
         return 'It is a dog'
     else:
         return 'It is a cat'
@@ -77,5 +84,4 @@ def index(token):
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run()
